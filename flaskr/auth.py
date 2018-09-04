@@ -1,17 +1,17 @@
 # 认证蓝图模块
 import functools
-from flask import (Blueprint, flash, g, redirect,
-                   render_template, request, session, url_for)
+from flask import (Blueprint, flash, g, redirect, render_template, request,
+                   session, url_for)
 
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.db import get_db
 
-
 # 创建一个名为auth的Blueprint
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+
 # 关联register视图函数
-@bp.route()('/register', methods=('GET', 'POST'))
+@bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
         # 映射提交的键和值
@@ -25,7 +25,8 @@ def register():
         elif not password:
             error = 'password is required'
         # 查询数据库username是否已存在,fetchone根据查询返回一个记录行
-        elif db.execute('SELECT id FROM user WHERE username = ?', (username, )).fetchone is not None:
+        elif db.execute('SELECT id FROM user WHERE username = ?',
+                        (username, )).fetchone is not None:
             error = 'User {} is already registered'.format(username)
 
         if error is None:
@@ -49,7 +50,8 @@ def login():
         db = get_db()
         error = None
         # 查询用户是否在数据库中
-        user = db.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
+        user = db.execute('SELECT * FROM user WHERE username = ?',
+                          (username, )).fetchone()
 
         # 判断用户名是否正确
         if user is None:
@@ -57,15 +59,15 @@ def login():
         # 判断密码是否正确,比较哈希值
         elif not check_password_hash(user['password'], password):
             error = 'incorrect password'
-        
+
         if error is None:
             # session用于储存横跨请求的值, 请求成功则id存于新会话中
             session.clear()
             session['user_id'] = user['id']
             return redirect((url_for('index')))
-        
+
         flash(error)
-    
+
     return render_template('auth/login.html')
 
 
@@ -78,7 +80,8 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
+        g.user = get_db().execute('SELECT * FROM user WHERE id = ?',
+                                  (user_id, )).fetchone()
 
 
 # 注销的时候需要把用户 id 从 session 中移除
@@ -94,7 +97,7 @@ def login_required(view):
     def wrapped_view(**kwargs):
         if g.user is None:
             return redirect(url_for('auth.login'))
-        
+
         return view(**kwargs)
-    
+
     return wrapped_view
