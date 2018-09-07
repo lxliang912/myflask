@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "${workspaceFolder}\\flask\\Scripts\\python.exe",
+    "python.pythonPath": "C:\\Program Files\\Python37\\python.exe",
     "python.linting.pylintEnabled": false,
     "python.formatting.provider": "yapf"
 }

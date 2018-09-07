@@ -6,7 +6,7 @@ from flask import (Blueprint, flash, g, redirect, render_template, request,
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.db import get_db
 
-# 创建一个名为auth的Blueprint
+# 创建一个名为auth的蓝图
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
@@ -15,7 +15,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def register():
     if request.method == 'POST':
         # 映射提交的键和值
-        username = request.form['usernme']
+        username = request.form['username']
         password = request.form['password']
         db = get_db()
         error = None
@@ -26,13 +26,13 @@ def register():
             error = 'password is required'
         # 查询数据库username是否已存在,fetchone根据查询返回一个记录行
         elif db.execute('SELECT id FROM user WHERE username = ?',
-                        (username, )).fetchone is not None:
-            error = 'User {} is already registered'.format(username)
+                        (username, )).fetchone() is not None:
+            error = 'User {} is already registered.'.format(username)
 
         if error is None:
             # 验证成功,在数据库中插入数据
-            db.execute('INISERT INTO user (username, password) VALUES (?, ?)',
-                       (username, generate_password_hash((password))))
+            db.execute('INSERT INTO user (username, password) VALUES (?, ?)',
+                       (username, generate_password_hash(password)))
             db.commit()
             return redirect((url_for('auth.login')))
         #  用于储存在渲染模块时可以调用的信息
@@ -54,11 +54,13 @@ def login():
                           (username, )).fetchone()
 
         # 判断用户名是否正确
+        print(user)
         if user is None:
             error = 'incorrect username'
         # 判断密码是否正确,比较哈希值
         elif not check_password_hash(user['password'], password):
             error = 'incorrect password'
+            print(password)
 
         if error is None:
             # session用于储存横跨请求的值, 请求成功则id存于新会话中

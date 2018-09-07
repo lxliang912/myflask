@@ -22,7 +22,7 @@ def get_db():
 # 通过检查g.db确定连接是否建立
 def close_db(e=None):
     db = g.pop('db', None)
-    # 建立连接则关闭连接
+    # 已建立连接则关闭连接
     if db is not None:
         db.close()
 

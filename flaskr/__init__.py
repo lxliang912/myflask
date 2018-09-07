@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from . import db, auth
+from . import db, auth, blog
 
 
 def create_app(test_config=None):
@@ -26,13 +26,12 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # 创建一个路由
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World'
-
     db.init_app(app)
+
     # 导入并注册蓝图
     app.register_blueprint(auth.bp)
+    app.register_blueprint(blog.bp)
+
+    app.add_url_rule('/', endpoint='index')
 
     return app
