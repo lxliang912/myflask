@@ -5,6 +5,7 @@ from flask import (Blueprint, flash, g, redirect, render_template, request,
 
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.db import get_db
+import json
 
 # 创建一个名为auth的蓝图
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -34,11 +35,9 @@ def register():
             db.execute('INSERT INTO user (username, password) VALUES (?, ?)',
                        (username, generate_password_hash(password)))
             db.commit()
-            return redirect((url_for('auth.login')))
+            return 'register success'
         #  用于储存在渲染模块时可以调用的信息
         flash(error)
-
-    return render_template('auth/register.html')
 
 
 # 登录视图
@@ -60,17 +59,12 @@ def login():
         # 判断密码是否正确,比较哈希值
         elif not check_password_hash(user['password'], password):
             error = 'incorrect password'
-            print(password)
 
         if error is None:
-            # session用于储存横跨请求的值, 请求成功则id存于新会话中
-            session.clear()
-            session['user_id'] = user['id']
-            return redirect((url_for('index')))
+            message = {'code': 2000, 'data': {'data': 'login success'}}
+            return json.dumps(message)
 
         flash(error)
-
-    return render_template('auth/login.html')
 
 
 # 注册一个 在视图函数之前运行的函数
@@ -84,13 +78,6 @@ def load_logged_in_user():
     else:
         g.user = get_db().execute('SELECT * FROM user WHERE id = ?',
                                   (user_id, )).fetchone()
-
-
-# 注销的时候需要把用户 id 从 session 中移除
-@bp.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
 
 
 # 在其他视图中验证
