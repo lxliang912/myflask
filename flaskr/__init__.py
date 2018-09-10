@@ -1,11 +1,16 @@
 import os
 from flask import Flask
-from . import db, auth, blog
+from . import db, tasks
+from flask_cors import CORS
 
 
 def create_app(test_config=None):
     # 创建一个Flask实例
     app = Flask(__name__, instance_relative_config=True)
+
+    # 配置允许跨域请求
+    CORS(app, supports_credentials=True)
+
     # 设置一个应用的缺省配置
     app.config.from_mapping(
         # 用于保证数据安全，开发时设为dev，发布时用随机数重载
@@ -29,8 +34,7 @@ def create_app(test_config=None):
     db.init_app(app)
 
     # 导入并注册蓝图
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(blog.bp)
+    app.register_blueprint(tasks.bp)
 
     app.add_url_rule('/', endpoint='index')
 
