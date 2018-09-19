@@ -7,5 +7,5 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'flask',
+        'flask', 'flask_cors', 'flask_restful', 'flask_sqlalchemy'
     ])
