@@ -1,4 +1,4 @@
-from . import tasks
+from . import task_view
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api, Resource
@@ -32,14 +32,11 @@ class Task(db.Model):
         return '<task %r>' % self.task_name
 
 
+# 初始化数据库时先清除数据，再重新创建
 @app.before_first_request
 def init_database():
     db.drop_all()
-    db.create_all()
-    tasks = {Task('test task', False)}
-    db.session.add_all(tasks)
-    db.session.commit()
 
 
 api = Api(app)
-api.add_resource(tasks.Todo, '/')
+api.add_resource(task_view.TaskApi, '/todo')
