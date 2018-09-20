@@ -11,8 +11,11 @@ from flask_restful import Resource
 from flaskr.utils.response import success, error
 
 
-class TaskApi(Resource):
-    # get method, get all task data
+class TaskListApi(Resource):
+    """
+    get task list
+    """
+
     def get(self):
         task_list = []
         tasks = init_app.Task.query.all()
@@ -28,7 +31,12 @@ class TaskApi(Resource):
                 })
             return success(task_list)
 
-    # post method, create only one task each time
+    """
+    create only one task each time
+    # argument: task_name(string), done(boolean)
+    # both necessary
+    """
+
     def post(self):
         json_data = request.get_json(force=True)
         if json_data['task_name'] is None:
@@ -43,11 +51,40 @@ class TaskApi(Resource):
             init_app.db.session.commit()
             return success('create success')
 
-    # put method, modify task data by task id
-    def put(self):
+
+def check_task_exist(task_name):
+    task = init_app.Task.query.filter(
+        init_app.Task.task_name == task_name).first()
+    if task is not None:
+        return True
+    else:
+        return False
+
+
+class TaskApi(Resource):
+    # get data of task by task id
+    def get(self, task_id):
+        task = init_app.Task.query.filter(
+            init_app.Task.task_id == task_id).first()
+        if task is None:
+            return error('task is not exist')
+        else:
+            return success({
+                'task_id': task_id,
+                'task_name': task.task_name,
+                'creation_date': task.creation_date,
+                'done': task.done
+            })
+
+    """
+    modify data of task by task id
+    # argument: task_name(string), done(boolean)
+    """
+
+    def put(self, task_id):
         json_data = request.get_json(force=True)
         task = init_app.Task.query.filter(
-            init_app.Task.task_id == json_data['task_id']).first()
+            init_app.Task.task_id == task_id).first()
 
         if task is None:
             return error('task is not exist')
@@ -57,10 +94,10 @@ class TaskApi(Resource):
             init_app.db.session.commit()
             return success('modify success')
 
-    def delete(self):
-        json_data = request.get_json(force=True)
+    # delete task by task id
+    def delete(self, task_id):
         task = init_app.Task.query.filter(
-            init_app.Task.task_id == json_data['task_id']).first()
+            init_app.Task.task_id == task_id).first()
 
         if task is None:
             return error('task is not exist')
@@ -68,12 +105,3 @@ class TaskApi(Resource):
             init_app.db.session.delete(task)
             init_app.db.session.commit()
             return success('delete success')
-
-
-def check_task_exist(task_name):
-    task = init_app.Task.query.filter(
-        init_app.Task.task_name == task_name).first()
-    if task is not None:
-        return True
-    else:
-        return False
