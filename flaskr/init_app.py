@@ -11,18 +11,34 @@ from flask_cors import CORS
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 
-DATABASE_PATH = 'database/todo.db'
+# sqlite
+# DATABASE_PATH = 'sqlite:///database/todo.db'
+# mysql
+DATABASE_PATH = 'mysql+pymysql://root:admin@localhost:3310/lxliang-mysql'
+api_name = '/todo/api/v1.0'
 
 app = Flask(__name__, instance_relative_config=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DATABASE_PATH
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_PATH
+# auto commit data into database while connection close
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
 db = SQLAlchemy(app)
 # 配置允许跨域请求
 CORS(app, supports_credentials=True)
 
+api = Api(app)
+api.add_resource(
+    task_view.TaskListApi,
+    api_name + '/tasks',
+    api_name + '/tasks/',
+    endpoint='tasks')
+api.add_resource(
+    task_view.TaskApi, api_name + '/tasks/<int:task_id>', endpoint='task')
+
 
 class Task(db.Model):
-    # __tablename__ = 'task'
+    __tablename__ = 'task'
+
     task_id = db.Column(db.Integer, primary_key=True)
     task_name = db.Column(db.String(250), nullable=False)
     creation_date = db.Column(
@@ -37,14 +53,3 @@ class Task(db.Model):
 
     def __repr__(self):
         return '<task %r>' % self.task_name
-
-
-# 初始化数据库时先清除数据，再重新创建
-@app.before_first_request
-def init_database():
-    db.drop_all()
-    db.create_all()
-
-
-api = Api(app)
-api.add_resource(task_view.TaskApi, '/todo')
