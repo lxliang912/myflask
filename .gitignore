@@ -1,5 +1,4 @@
 flask
 .DS_Store
-design
 *.log
 venv
