@@ -7,10 +7,19 @@
 """
 from flask import jsonify
 
+request_code = {
+    'success': 200,
+    'none': 401,
+    'net_error': 500,
+    'error': 404,
+    'exist': 201,
+}
 
-def success(data):
-    return jsonify({'code': 2000, 'data': data})
 
-
-def error(message):
-    return jsonify({'code': 2010, 'data': {'message': message}})
+def return_code(message, code_name):
+    return jsonify({
+        'code':code_name,
+        'data': {
+            'message': message
+        }
+    })

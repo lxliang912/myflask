@@ -19,10 +19,3 @@ class Task(db.Model):
         server_default=db.func.current_timestamp(),
         nullable=False)
     done = db.Column(db.Boolean)
-
-    def __init__(self, task_name, done):
-        self.task_name = task_name
-        self.done = done
-
-    def __repr__(self):
-        return 'task %r' % self.task_name
