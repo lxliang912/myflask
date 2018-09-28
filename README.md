@@ -24,16 +24,16 @@
 1. 创建虚拟环境，执行命令：venv\Scripts\activate
 2. 运行应用：
 >在 Linux and Mac 下：
->export FLASK_APP=app/app.py
->export FLASK_ENV=development
->flask run
+>* export FLASK_APP=app/app.py
+>* export FLASK_ENV=development
+>* flask run
 >
 >在 Windows 下，使用 set 代替 export ：
->set FLASK_APP=app/app.py
->set FLASK_ENV=development
->flask run
+>* set FLASK_APP=app/app.py
+>* set FLASK_ENV=development
+>* flask run
 >
 >在 Windows PowerShell 下，使用 $env: 代替 export ：
->$env:FLASK_APP = "app/app.py"
->$env:FLASK_ENV = "development"
->flask run
+>* $env:FLASK_APP = "app/app.py"
+>* $env:FLASK_ENV = "development"
+>* flask run
