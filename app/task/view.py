@@ -45,20 +45,12 @@ class TaskListApi(Resource):
             return error('task name is necessary')
         elif json_data['done'] is None:
             return error('task status is necessary')
-        elif check_task_exist(json_data['task_name']):
+        elif Task.query.filter_by(task_name=task_name).first() is not None:
             return error('task is already exist')
         else:
             db.session.add(Task(json_data['task_name'], json_data['done']))
             db.session.commit()
             return success('create success')
-
-
-def check_task_exist(task_name):
-    task = Task.query.filter(Task.task_name == task_name).first()
-    if task is not None:
-        return True
-    else:
-        return False
 
 
 class TaskApi(Resource):
