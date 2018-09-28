@@ -11,8 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from .config import DATABASE_PATH
 from .reference import db, api
-from .task.view import TaskApi, TaskListApi
-from .task.model import Task
+# import routers
 from . import router
 
 
