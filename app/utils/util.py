@@ -16,10 +16,17 @@ request_code = {
 }
 
 
-def return_code(message, code_name):
+def request_return(message, code_name):
     return jsonify({
-        'code':code_name,
+        'code': request_code[code_name],
         'data': {
             'message': message
         }
     })
+
+
+def is_empty(data):
+    if data is None or data == '':
+        return True
+    else:
+        return False

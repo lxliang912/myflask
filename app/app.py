@@ -19,10 +19,12 @@ from . import router
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
 
-    # Config database url
+    # Use to connect database
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_PATH
     # Auto commit data into database while connection close
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+    # Track the modified of object and send signal, need more memory
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Access-Control-Allow-Origin
     CORS(app, supports_credentials=True)
