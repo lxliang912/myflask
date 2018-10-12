@@ -8,9 +8,10 @@
 from flask import jsonify, request
 from flask_restful import Resource
 
-from app.utils.util import request_return, is_empty
+from app.utils.util import request_return, is_empty, check_token
 from app.reference import db
 from .model import Task
+from ..auth.model import Token
 
 
 class TaskListApi(Resource):
@@ -19,6 +20,12 @@ class TaskListApi(Resource):
     """
 
     def get(self):
+        token = request.headers.get('token')
+        result_data = check_token(token, TaskListApi.get_task_list, '')
+        return request_return(result_data['data'], result_data['code'])
+
+    @staticmethod
+    def get_task_list(data):
         task_list = []
         tasks = Task.query.all()
 
@@ -31,7 +38,7 @@ class TaskListApi(Resource):
                     'task_name': i.task_name,
                     'done': i.done,
                 })
-            return request_return(task_list, 'success')
+            return {'data': task_list, 'code': 'success'}
 
     """
     Create only one task each time
@@ -40,35 +47,51 @@ class TaskListApi(Resource):
     """
 
     def post(self):
+        token = request.headers.get('token')
+        result_data = check_token(token, TaskListApi.new_task, '')
+        return request_return(result_data['data'], result_data['code'])
+
+    @staticmethod
+    def new_task(data):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
 
         if is_empty(task_name):
-            return request_return('task name is necessary', 'none')
+            return {'data': 'task name is necessary', 'code': 'none'}
         elif is_empty(task_status):
-            return request_return('task status is necessary', 'none')
+            return {'data': 'task status is necessary', 'code': 'none'}
         elif Task.query.filter_by(task_name=task_name).first() is not None:
-            return request_return('task is already exist', 'exist')
+            return {'data': 'task is already exist', 'code': 'exist'}
         else:
             db.session.add(Task(task_name, task_status))
             db.session.commit()
-            return request_return('create success', 'success')
+            return {'data': 'create success', 'code': 'success'}
 
 
 class TaskApi(Resource):
     # Get data of task by task id
     def get(self, task_id):
+        token = request.headers.get('token')
+        result_data = check_token(token, TaskApi.get_task, task_id)
+        return request_return(result_data['data'], result_data['code'])
+
+    @staticmethod
+    def get_task(task_id):
         task = Task.query.filter(Task.task_id == task_id).first()
+
         if task is None:
-            return request_return('task is not exist', 'none')
+            return {'data': 'task is not exist', 'code': 'none'}
         else:
-            return request_return({
-                'task_id': task_id,
-                'task_name': task.task_name,
-                'creation_date': task.creation_date,
-                'done': task.done
-            }, 'success')
+            return {
+                'data': {
+                    'task_id': task_id,
+                    'task_name': task.task_name,
+                    'creation_date': task.creation_date,
+                    'done': task.done
+                },
+                'code': 'success'
+            }
 
     """
     Modify data of task by task id
@@ -76,26 +99,38 @@ class TaskApi(Resource):
     """
 
     def put(self, task_id):
+        token = request.headers.get('token')
+        result_data = check_token(token, TaskApi.update_task, task_id)
+        return request_return(result_data['data'], result_data['code'])
+
+    @staticmethod
+    def update_task(task_id):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
         task = Task.query.filter(Task.task_id == task_id).first()
 
         if task is None:
-            return request_return('task is not exist', 'exist')
+            return {'data': 'task is not exist', 'code': 'exist'}
         else:
             task.task_name = task_name
             task.done = task_status
             db.session.commit()
-            return request_return('modify success', 'success')
+            return {'data': 'modify success', 'code': 'success'}
 
     # Delete task by task id
     def delete(self, task_id):
+        token = request.headers.get('token')
+        result_data = check_token(token, TaskApi.delete_task, task_id)
+        return request_return(result_data['data'], result_data['code'])
+
+    @staticmethod
+    def delete_task(task_id):
         task = Task.query.filter(Task.task_id == task_id).first()
 
         if task is None:
-            return request_return('task is not exist', 'exist')
+            return {'data': 'task is not exist', 'code': 'exist'}
         else:
             db.session.delete(task)
             db.session.commit()
-            return request_return('delete success', 'success')
+            return {'data': 'delete success', 'code': 'success'}

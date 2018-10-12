@@ -3,7 +3,7 @@
 @Project: *
 @Author: lxliang912
 @Date: 9/18/2018
-@Description: create flask app
+@Description: Create flask app and initialized reference with app
 """
 from flask import Flask
 from flask_cors import CORS
