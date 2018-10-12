@@ -35,7 +35,7 @@ class Token(object):
         self.username = username
 
     # Generate token if login success
-    def generate_auth_token(self, expiration=7200):
+    def generate_auth_token(self, expiration=3600):
         s = Serializer('SECRET_KEY', expiration)
         return {
             'token': s.dumps({
@@ -51,7 +51,9 @@ class Token(object):
             data = s.loads(token)
             return util.is_empty(
                 Auth.query.filter(Auth.username == data['username']).first())
+        # Valid token, but expired
         except SignatureExpired:
-            return None
+            return 'expired'
+        # Invalid token
         except BadSignature:
-            return None
+            return 'invalid'
