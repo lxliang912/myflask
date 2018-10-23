@@ -20,13 +20,8 @@ request_code = {
 
 
 # Return request data
-def request_return(message, code_name):
-    return jsonify({
-        'code': request_code[code_name],
-        'data': {
-            'message': message
-        }
-    })
+def request_return(data, code_name):
+    return jsonify({'code': request_code[code_name], 'data': data})
 
 
 # Check data is empty
@@ -38,15 +33,15 @@ def is_empty(data):
 
 
 # Check token while auth request
-def check_token(token, callback, argument):
-    if is_empty(token):
+def check_token(arguments, callback):
+    if is_empty(arguments['token']):
         return {'data': 'please login first', 'code': 'error'}
     # Token is expired
-    elif Token.verify_auth_token(token) == 'expired':
-        return {'data': 'token is expired', 'code': 'none'}
+    elif Token.verify_auth_token(arguments['token']) == 'expired':
+        return {'data': 'token is expired, please login again', 'code': 'none'}
     # Token is invalid
-    elif Token.verify_auth_token(token) == 'invalid':
+    elif Token.verify_auth_token(arguments['token']) == 'invalid':
         return {'data': 'token is invalid', 'code': 'error'}
     # Token verify success
-    elif not Token.verify_auth_token(token):
-        return callback(argument)
+    elif not Token.verify_auth_token(arguments['token']):
+        return callback(arguments['data'])

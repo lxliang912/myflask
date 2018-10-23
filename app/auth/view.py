@@ -60,13 +60,11 @@ class LoginApi(Resource):
                 # Check login password
                 if not user_password.verify_password(password):
                     return request_return('wrong password', 'none')
-                # Login success
+                # Login success, return token auth
                 else:
-                    token_info = Token(user.username).generate_auth_token()
-
                     return request_return({
                         'status': 'login success',
-                        'data': token_info
+                        'data': Token(user.username).generate_auth_token()
                     }, 'success')
             # User is not exist in the database
             else:
