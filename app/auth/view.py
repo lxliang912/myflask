@@ -11,7 +11,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from app.utils.util import request_return, request_code, is_empty
 from app.reference import db
-from .model import Auth, Token
+from .model import User, Token
 
 
 class RegisterApi(Resource):
@@ -27,11 +27,11 @@ class RegisterApi(Resource):
         if is_empty(password):
             return request_return('password is null', 'none')
         # User is already exist
-        elif Auth.query.filter_by(username=username).first() is not None:
+        elif User.query.filter_by(username=username).first() is not None:
             return request_return('user is already exist', 'exist')
         # Register new user
         else:
-            user = Auth(username=username)
+            user = User(username=username)
             user.hash_password(password)
             db.session.add(user)
             db.session.commit()
@@ -52,20 +52,21 @@ class LoginApi(Resource):
             return request_return('password is null', 'none')
         # Post data format is right
         else:
-            user = Auth.query.filter_by(username=username).first()
+            user = User.query.filter_by(username=username).first()
             # User is exist
             if user is not None:
                 # Argument must be hash password
-                user_password = Auth(password_hash=user.password_hash)
+                user_password = User(password_hash=user.password_hash)
                 # Check login password
                 if not user_password.verify_password(password):
                     return request_return('wrong password', 'none')
                 # Login success, return token auth
                 else:
-                    return request_return({
-                        'status': 'login success',
-                        'data': Token(user.username).generate_auth_token()
-                    }, 'success')
+                    return request_return(
+                        {
+                            'status': 'login success',
+                            'data': Token(user.username).generate_auth_token()
+                        }, 'success')
             # User is not exist in the database
             else:
                 return request_return(

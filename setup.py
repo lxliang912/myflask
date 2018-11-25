@@ -8,5 +8,5 @@ setup(
     zip_safe=False,
     install_requires=[
         'flask', 'flask_cors', 'flask_restful', 'flask_sqlalchemy',
-        ' flask-jwt-extended'
+        ' flask-jwt-extended', 'flask_httpauth', 'itsdangerous'
     ])

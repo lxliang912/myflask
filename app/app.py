@@ -25,6 +25,7 @@ def create_app():
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     # Track the modified of object and send signal, need more memory
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # create database table
 
     # Access-Control-Allow-Origin
     CORS(app, supports_credentials=True)
@@ -38,3 +39,6 @@ def create_app():
 def init_reference(app):
     db.init_app(app)
     api.init_app(app)
+
+
+db.create_all(app=create_app())

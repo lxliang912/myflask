@@ -48,10 +48,12 @@ class TaskListApi(Resource):
             return {'data': {'message': 'not task'}, 'code': 'success'}
         elif len(tasks_data.items) > 0:
             for task in tasks_data.items:
+                print(task.user)
                 task_list.append({
                     'task_id': task.task_id,
                     'task_name': task.task_name,
                     'done': task.done,
+                    'user': task.user
                 })
             return {
                 'data': {

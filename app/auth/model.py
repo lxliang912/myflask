@@ -15,7 +15,7 @@ from app.reference import db
 import app.utils.util as util
 
 
-class Auth(db.Model):
+class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(45), index=True)
@@ -50,7 +50,7 @@ class Token(object):
         try:
             data = s.loads(token)
             return util.is_empty(
-                Auth.query.filter(Auth.username == data['username']).first())
+                User.query.filter(User.username == data['username']).first())
         # Valid token, but expired
         except SignatureExpired:
             return 'expired'

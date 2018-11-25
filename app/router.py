@@ -3,10 +3,8 @@
 @Project: *
 @Author: lxliang912
 @Date: 09/21/2018
-@Description: Api path list
+@Description: Api router list
 """
-from flask_restful import Resource
-
 from app.reference import api
 from app.config import api_name
 
