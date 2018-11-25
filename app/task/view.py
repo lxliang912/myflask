@@ -41,19 +41,18 @@ class TaskListApi(Resource):
         task_list = []
         # get task list by paginate, return data by ascending or descending (default Ascending)
         # method: asc , desc
-        tasks_data = Task.query.order_by(Task.task_id.asc()).paginate(
+        tasks_data = Task.query.order_by(Task.id.asc()).paginate(
             data['page'], per_page=data['per_page'], error_out=False)
 
         if len(tasks_data.items) < 1:
             return {'data': {'message': 'not task'}, 'code': 'success'}
         elif len(tasks_data.items) > 0:
             for task in tasks_data.items:
-                print(task.user)
                 task_list.append({
-                    'task_id': task.task_id,
+                    'id': task.id,
                     'task_name': task.task_name,
                     'done': task.done,
-                    'user': task.user
+                    'username': task.username
                 })
             return {
                 'data': {
@@ -117,26 +116,26 @@ class TaskListApi(Resource):
 
 class TaskApi(Resource):
     # Get data of task by task id
-    def get(self, task_id):
+    def get(self, id):
         token = request.headers.get('token')
         result_data = check_token({
             'token': token,
             'data': {
-                'task_id': task_id
+                'id': id
             }
         }, TaskApi.get_task)
         return request_return(result_data['data'], result_data['code'])
 
     @staticmethod
     def get_task(data):
-        task = Task.query.filter(Task.task_id == data['task_id']).first()
+        task = Task.query.filter(Task.id == data['id']).first()
 
         if task is None:
             return {'data': 'task is not exist', 'code': 'none'}
         else:
             return {
                 'data': {
-                    'task_id': data['task_id'],
+                    'id': data['id'],
                     'task_name': task.task_name,
                     'creation_date': task.creation_date,
                     'done': task.done
@@ -149,12 +148,12 @@ class TaskApi(Resource):
     # argument: task_name(string), done(boolean)
     """
 
-    def put(self, task_id):
+    def put(self, id):
         token = request.headers.get('token')
         result_data = check_token({
             'token': token,
             'data': {
-                'task_id': task_id
+                'id': id
             }
         }, TaskApi.update_task)
 
@@ -165,7 +164,7 @@ class TaskApi(Resource):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
-        task = Task.query.filter(Task.task_id == data['task_id']).first()
+        task = Task.query.filter(Task.id == data['id']).first()
 
         if task is None:
             return {'data': {'message': 'task is not exist'}, 'code': 'exist'}
@@ -176,12 +175,12 @@ class TaskApi(Resource):
             return {'data': {'message': 'modify success'}, 'code': 'success'}
 
     # Delete task by task id
-    def delete(self, task_id):
+    def delete(self, id):
         token = request.headers.get('token')
         result_data = check_token({
             'token': token,
             'data': {
-                'task_id': task_id
+                'id': id
             }
         }, TaskApi.delete_task)
 
@@ -189,7 +188,7 @@ class TaskApi(Resource):
 
     @staticmethod
     def delete_task(data):
-        task = Task.query.filter(Task.task_id == data['task_id']).first()
+        task = Task.query.filter(Task.id == data['id']).first()
 
         if task is None:
             return {'data': {'message': 'task is not exist'}, 'code': 'exist'}

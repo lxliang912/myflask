@@ -5,7 +5,6 @@
 @Date: 09/21/2018
 @Description: create table task and insert data into table
 """
-
 from app.reference import db
 
 # from app.auth.model import User
@@ -14,7 +13,7 @@ from app.reference import db
 class Task(db.Model):
     __tablename__ = 'task'
 
-    task_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     task_name = db.Column(db.String(250), nullable=False)
     creation_date = db.Column(
         db.TIMESTAMP,
@@ -22,9 +21,7 @@ class Task(db.Model):
         nullable=False)
     done = db.Column(db.Boolean)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # user = db.relationship('User', backref='task')
 
-    def __init__(self, task_name, done, user):
+    def __init__(self, task_name, done):
         self.task_name = task_name
         self.done = done
-        self.user = user

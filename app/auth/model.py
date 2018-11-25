@@ -20,6 +20,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(45), index=True)
     password_hash = db.Column(db.String(256))
+    task = db.relationship('Task', backref='user', lazy='dynamic')
 
     # When register success, stores password with hash of the user
     def hash_password(self, password):
