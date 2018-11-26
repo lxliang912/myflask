@@ -7,8 +7,6 @@
 """
 from app.reference import db
 
-# from app.auth.model import User
-
 
 class Task(db.Model):
     __tablename__ = 'task'
@@ -21,7 +19,9 @@ class Task(db.Model):
         nullable=False)
     done = db.Column(db.Boolean)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', backref=db.backref('user', lazy='dynamic'))
 
-    def __init__(self, task_name, done):
+    def __init__(self, task_name, done, user):
         self.task_name = task_name
         self.done = done
+        self.user = user

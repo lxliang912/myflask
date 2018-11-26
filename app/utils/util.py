@@ -6,8 +6,9 @@
 @Description: Util function
 """
 from flask import jsonify
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
-from app.auth.model import Token
+from app.auth.model import Token, User
 
 # Request code
 request_code = {
@@ -44,4 +45,12 @@ def check_token(arguments, callback):
         return {'data': 'token is invalid', 'code': 'error'}
     # Token verify success
     elif not Token.verify_auth_token(arguments['token']):
-        return callback(arguments['data'])
+        return callback(arguments['data'], arguments['token'])
+
+
+# get userifno from token
+def get_userinfo(token):
+    s = Serializer('SECRET_KEY')
+    data = s.loads(token)
+    user = User.query.filter(User.username == data['username']).first()
+    return user

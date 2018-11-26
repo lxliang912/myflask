@@ -8,10 +8,10 @@
 from flask import jsonify, request
 from flask_restful import Resource
 
-from app.utils.util import request_return, is_empty, check_token
+from app.utils.util import request_return, is_empty, check_token, get_userinfo
 from app.reference import db
 from .model import Task
-from ..auth.model import Token
+from ..auth.model import Token, User
 
 
 class TaskListApi(Resource):
@@ -37,10 +37,10 @@ class TaskListApi(Resource):
         return request_return(result_data['data'], result_data['code'])
 
     @staticmethod
-    def get_task_list(data):
+    def get_task_list(data, token):
         task_list = []
         # get task list by paginate, return data by ascending or descending (default Ascending)
-        # method: asc , desc
+        # order by: asc , desc
         tasks_data = Task.query.order_by(Task.id.asc()).paginate(
             data['page'], per_page=data['per_page'], error_out=False)
 
@@ -52,7 +52,10 @@ class TaskListApi(Resource):
                     'id': task.id,
                     'task_name': task.task_name,
                     'done': task.done,
-                    'username': task.username
+                    'user': {
+                        'id': task.user.id,
+                        'username': task.user.username,
+                    }
                 })
             return {
                 'data': {
@@ -82,7 +85,7 @@ class TaskListApi(Resource):
         return request_return(result_data['data'], result_data['code'])
 
     @staticmethod
-    def new_task(data):
+    def new_task(data, token):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
@@ -109,7 +112,9 @@ class TaskListApi(Resource):
                 'code': 'exist'
             }
         else:
-            db.session.add(Task(task_name, task_status))
+            user = get_userinfo(token)
+            Task(task_name, task_status, user)
+            db.session.add(user)
             db.session.commit()
             return {'data': {'message': 'create success'}, 'code': 'success'}
 
@@ -127,7 +132,7 @@ class TaskApi(Resource):
         return request_return(result_data['data'], result_data['code'])
 
     @staticmethod
-    def get_task(data):
+    def get_task(data, token):
         task = Task.query.filter(Task.id == data['id']).first()
 
         if task is None:
@@ -160,7 +165,7 @@ class TaskApi(Resource):
         return request_return(result_data['data'], result_data['code'])
 
     @staticmethod
-    def update_task(data):
+    def update_task(data, token):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
@@ -187,7 +192,7 @@ class TaskApi(Resource):
         return request_return(result_data['data'], result_data['code'])
 
     @staticmethod
-    def delete_task(data):
+    def delete_task(data, token):
         task = Task.query.filter(Task.id == data['id']).first()
 
         if task is None:
