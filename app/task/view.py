@@ -39,15 +39,18 @@ class TaskListApi(Resource):
     @staticmethod
     def get_task_list(data, token):
         task_list = []
+        cur_user = get_userinfo(token)
         # get task list by paginate, return data by ascending or descending (default Ascending)
         # order by: asc , desc
-        tasks_data = Task.query.order_by(Task.id.asc()).paginate(
-            data['page'], per_page=data['per_page'], error_out=False)
+        tasks_data = Task.query.filter(cur_user.id == Task.user_id).order_by(
+            Task.id.asc()).paginate(
+                data['page'], per_page=data['per_page'], error_out=False)
 
         if len(tasks_data.items) < 1:
             return {'data': {'message': 'not task'}, 'code': 'success'}
         elif len(tasks_data.items) > 0:
             for task in tasks_data.items:
+                # add task to task list
                 task_list.append({
                     'id': task.id,
                     'task_name': task.task_name,
@@ -57,6 +60,7 @@ class TaskListApi(Resource):
                         'username': task.user.username,
                     }
                 })
+
             return {
                 'data': {
                     'message': 'success',
