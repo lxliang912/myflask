@@ -145,10 +145,14 @@ class TaskApi(Resource):
         else:
             return {
                 'data': {
-                    'id': data['id'],
+                    'id': task.id,
                     'task_name': task.task_name,
                     'creation_date': task.creation_date,
-                    'done': task.done
+                    'done': task.done,
+                    'user': {
+                        'id': task.user.id,
+                        'username': task.user.username,
+                    }
                 },
                 'code': 'success'
             }
