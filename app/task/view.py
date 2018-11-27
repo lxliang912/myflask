@@ -40,7 +40,7 @@ class TaskListApi(Resource):
     def get_task_list(data, token):
         task_list = []
         cur_user = get_userinfo(token)
-        # get task list by paginate, return data by ascending or descending (default Ascending)
+        # get task list by paginate with userId, return data by ascending or descending (default Ascending)
         # order by: asc , desc
         tasks_data = Task.query.filter(cur_user.id == Task.user_id).order_by(
             Task.id.asc()).paginate(
@@ -55,6 +55,7 @@ class TaskListApi(Resource):
                     'id': task.id,
                     'task_name': task.task_name,
                     'done': task.done,
+                    'creation_date': task.creation_date,
                     'user': {
                         'id': task.user.id,
                         'username': task.user.username,
