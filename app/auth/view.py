@@ -33,8 +33,7 @@ class RegisterApi(Resource):
         else:
             user = User(username=username)
             user.hash_password(password)
-            db.session.add(user)
-            db.session.commit()
+            user.save_to_db()
             return request_return('register success', 'success')
 
 

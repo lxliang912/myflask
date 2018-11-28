@@ -8,7 +8,7 @@
 from flask import jsonify, request
 from flask_restful import Resource
 
-from app.utils.util import request_return, is_empty, check_token, get_userinfo
+from app.utils.util import request_return, is_empty, check_token, get_userinfo, save_to_db, delete_data
 from app.reference import db
 from .model import Task
 from ..auth.model import Token, User
@@ -117,10 +117,9 @@ class TaskListApi(Resource):
                 'code': 'exist'
             }
         else:
-            user = get_userinfo(token)
-            Task(task_name, task_status, user)
-            db.session.add(user)
-            db.session.commit()
+            task_user = get_userinfo(token)
+            Task(task_name, task_status, task_user)
+            save_to_db(task_user)
             return {'data': {'message': 'create success'}, 'code': 'success'}
 
 
@@ -207,6 +206,5 @@ class TaskApi(Resource):
         if task is None:
             return {'data': {'message': 'task is not exist'}, 'code': 'exist'}
         else:
-            db.session.delete(task)
-            db.session.commit()
+            delete_data(task)
             return {'data': {'message': 'delete success'}, 'code': 'success'}
