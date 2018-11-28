@@ -1,5 +1,5 @@
 """
-@Filename: view.py(user)
+@Filename: view.py(auth)
 @Project: *
 @Author: lxliang912
 @Date: 09/21/2018
