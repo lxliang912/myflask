@@ -29,6 +29,11 @@ class User(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    # Save request data into database
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
 
 class Token(object):
     def __init__(self, username):

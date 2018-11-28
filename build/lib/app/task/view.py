@@ -41,7 +41,7 @@ class TaskListApi(Resource):
         task_list = []
         # get task list by paginate, return data by ascending or descending (default Ascending)
         # method: asc , desc
-        tasks_data = Task.query.order_by(Task.task_id.asc()).paginate(
+        tasks_data = Task.query.order_by(Task.id.asc()).paginate(
             data['page'], per_page=data['per_page'], error_out=False)
 
         if len(tasks_data.items) < 1:
@@ -49,7 +49,7 @@ class TaskListApi(Resource):
         elif len(tasks_data.items) > 0:
             for task in tasks_data.items:
                 task_list.append({
-                    'task_id': task.task_id,
+                    'task_id': task.id,
                     'task_name': task.task_name,
                     'done': task.done,
                 })
@@ -127,7 +127,7 @@ class TaskApi(Resource):
 
     @staticmethod
     def get_task(data):
-        task = Task.query.filter(Task.task_id == data['task_id']).first()
+        task = Task.query.filter(Task.id == data['task_id']).first()
 
         if task is None:
             return {'data': 'task is not exist', 'code': 'none'}
@@ -163,7 +163,7 @@ class TaskApi(Resource):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
-        task = Task.query.filter(Task.task_id == data['task_id']).first()
+        task = Task.query.filter(Task.id == data['task_id']).first()
 
         if task is None:
             return {'data': {'message': 'task is not exist'}, 'code': 'exist'}
@@ -187,7 +187,7 @@ class TaskApi(Resource):
 
     @staticmethod
     def delete_task(data):
-        task = Task.query.filter(Task.task_id == data['task_id']).first()
+        task = Task.query.filter(Task.id == data['task_id']).first()
 
         if task is None:
             return {'data': {'message': 'task is not exist'}, 'code': 'exist'}

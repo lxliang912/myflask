@@ -9,6 +9,7 @@ from flask import jsonify
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from app.auth.model import Token, User
+from app.reference import db
 
 # Request code
 request_code = {
@@ -54,3 +55,15 @@ def get_userinfo(token):
     data = s.loads(token)
     user = User.query.filter(User.username == data['username']).first()
     return user
+
+
+# Add data into database
+def save_to_db(data):
+    db.session.add(data)
+    db.session.commit()
+
+
+# Delete data in database
+def delete_data(data):
+    db.session.delete(data)
+    db.session.commit()

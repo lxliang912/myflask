@@ -12,7 +12,7 @@ from app.reference import db
 class Task(db.Model):
     __tablename__ = 'task'
 
-    task_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     task_name = db.Column(db.String(250), nullable=False)
     creation_date = db.Column(
         db.TIMESTAMP,
