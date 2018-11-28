@@ -1,5 +1,5 @@
 """
-@Filename: model.py(user)
+@Filename: model.py(auth)
 @Project: *
 @Author: lxliang912
 @Date: 09/21/2018

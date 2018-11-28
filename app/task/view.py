@@ -1,11 +1,11 @@
 """
-@Filename: tasks.py
+@Filename: view.py(task)
 @Project: *
 @Author: lxliang912
 @Date: 9/18/2018
 @Description: Get data of task
 """
-from flask import jsonify, request
+from flask import request
 from flask_restful import Resource
 
 from app.utils.util import request_return, is_empty, check_token, get_userinfo, save_to_db, delete_data
@@ -32,40 +32,44 @@ class TaskListApi(Resource):
                 'page': page,
                 'per_page': per_page
             }
-        }, TaskListApi.get_task_list)
+        }, self.get_task_list)
 
         return request_return(result_data['data'], result_data['code'])
 
-    @staticmethod
-    def get_task_list(data, token):
+    @classmethod
+    # Return task list with json type
+    def return_tasks(cls, task_list):
+        def to_json(task):
+            return {
+                'id': task.id,
+                'task_name': task.task_name,
+                'done': task.done,
+                'creation_date': task.creation_date,
+                'user': {
+                    'id': task.user.id,
+                    'username': task.user.username,
+                }
+            }
+
+        return list(map(lambda task: to_json(task), task_list))
+
+    @classmethod
+    def get_task_list(cls, data, token):
         task_list = []
         cur_user = get_userinfo(token)
         # get task list by paginate with userId, return data by ascending or descending (default Ascending)
         # order by: asc , desc
         tasks_data = Task.query.filter(cur_user.id == Task.user_id).order_by(
             Task.id.asc()).paginate(
-                data['page'], per_page=data['per_page'], error_out=False)
+                page=data['page'], per_page=data['per_page'], error_out=False)
 
         if len(tasks_data.items) < 1:
             return {'data': {'message': 'not task'}, 'code': 'success'}
         elif len(tasks_data.items) > 0:
-            for task in tasks_data.items:
-                # add task to task list
-                task_list.append({
-                    'id': task.id,
-                    'task_name': task.task_name,
-                    'done': task.done,
-                    'creation_date': task.creation_date,
-                    'user': {
-                        'id': task.user.id,
-                        'username': task.user.username,
-                    }
-                })
-
             return {
                 'data': {
                     'message': 'success',
-                    'task_list': task_list,
+                    'task_list': cls.return_tasks(tasks_data.items),
                     'pages': tasks_data.pages,
                     'cur_page': tasks_data.page,
                     'per_page': tasks_data.per_page,
@@ -76,21 +80,18 @@ class TaskListApi(Resource):
 
     """
     Create only one task each time
-    # argument: task_name(string), done(boolean)
-    # both necessary
+    argument: task_name(string), done(boolean)
+    both necessary
     """
 
     def post(self):
         token = request.headers.get('token')
-        result_data = check_token({
-            'token': token,
-            'data': {}
-        }, TaskListApi.new_task)
+        result_data = check_token({'token': token, 'data': {}}, self.new_task)
 
         return request_return(result_data['data'], result_data['code'])
 
-    @staticmethod
-    def new_task(data, token):
+    @classmethod
+    def new_task(cls, data, token):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
@@ -132,11 +133,11 @@ class TaskApi(Resource):
             'data': {
                 'id': id
             }
-        }, TaskApi.get_task)
+        }, self.get_task)
         return request_return(result_data['data'], result_data['code'])
 
-    @staticmethod
-    def get_task(data, token):
+    @classmethod
+    def get_task(cls, data, token):
         task = Task.query.filter(Task.id == data['id']).first()
 
         if task is None:
@@ -168,12 +169,12 @@ class TaskApi(Resource):
             'data': {
                 'id': id
             }
-        }, TaskApi.update_task)
+        }, self.update_task)
 
         return request_return(result_data['data'], result_data['code'])
 
-    @staticmethod
-    def update_task(data, token):
+    @classmethod
+    def update_task(cls, data, token):
         json_data = request.get_json(force=True)
         task_name = json_data['task_name']
         task_status = json_data['done']
@@ -195,12 +196,12 @@ class TaskApi(Resource):
             'data': {
                 'id': id
             }
-        }, TaskApi.delete_task)
+        }, self.delete_task)
 
         return request_return(result_data['data'], result_data['code'])
 
-    @staticmethod
-    def delete_task(data, token):
+    @classmethod
+    def delete_task(cls, data, token):
         task = Task.query.filter(Task.id == data['id']).first()
 
         if task is None:
