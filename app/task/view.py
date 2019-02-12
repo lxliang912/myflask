@@ -37,23 +37,6 @@ class TaskListApi(Resource):
         return request_return(result_data['data'], result_data['code'])
 
     @classmethod
-    # Return task list with json type
-    def return_tasks(cls, task_list):
-        def to_json(task):
-            return {
-                'id': task.id,
-                'task_name': task.task_name,
-                'done': task.done,
-                'creation_date': task.creation_date,
-                'user': {
-                    'id': task.user.id,
-                    'username': task.user.username,
-                }
-            }
-
-        return list(map(lambda task: to_json(task), task_list))
-
-    @classmethod
     def get_task_list(cls, data, token):
         task_list = []
         cur_user = get_userinfo(token)
@@ -78,10 +61,27 @@ class TaskListApi(Resource):
                 'code': 'success'
             }
 
+    @classmethod
+    # Return task list with json type
+    def return_tasks(cls, task_list):
+        def to_json(task):
+            return {
+                'id': task.id,
+                'task_name': task.task_name,
+                'done': task.done,
+                'creation_date': task.creation_date,
+                'user': {
+                    'id': task.user.id,
+                    'username': task.user.username,
+                }
+            }
+
+        return list(map(lambda task: to_json(task), task_list))
+
     """
     Create only one task each time
     argument: task_name(string), done(boolean)
-    both necessary
+    necessary: both
     """
 
     def post(self):

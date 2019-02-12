@@ -59,10 +59,8 @@ class UserListApi(Resource):
     @classmethod
     # Return user list with json type
     def return_users(cls, user_list):
-        def to_json(user):
-            return {
-                'id': user.id,
-                'user_name': user.username,
-            }
-
-        return list(map(lambda user: to_json(user), user_list))
+        return list(
+            map(
+                lambda user_list_item: {
+                    'id': user_list_item.id,
+                    'user_name': user_list_item.username, }, user_list))
