@@ -5,12 +5,11 @@
 @Date: 09/21/2018
 @Description: Get data of user
 """
-from flask import jsonify, request, g
+from flask import request
 from flask_restful import Resource
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
-from app.utils.util import request_return, request_code, is_empty
-from app.reference import db
+from app.utils.util import request_return, is_empty
 from .model import User, Token
 
 

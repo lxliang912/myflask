@@ -36,17 +36,6 @@ class UserListApi(Resource):
         return request_return(result_data['data'], result_data['code'])
 
     @classmethod
-    # Return user list with json type
-    def return_users(cls, user_list):
-        def to_json(user):
-            return {
-                'id': user.id,
-                'user_name': user.username,
-            }
-
-        return list(map(lambda user: to_json(user), user_list))
-
-    @classmethod
     def get_user_list(cls, data, token):
         user_list = []
         user_data = User.query.order_by(User.id.asc()).paginate(
@@ -66,3 +55,14 @@ class UserListApi(Resource):
                 },
                 'code': 'success'
             }
+
+    @classmethod
+    # Return user list with json type
+    def return_users(cls, user_list):
+        def to_json(user):
+            return {
+                'id': user.id,
+                'user_name': user.username,
+            }
+
+        return list(map(lambda user: to_json(user), user_list))
